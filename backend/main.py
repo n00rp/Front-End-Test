@@ -66,12 +66,20 @@ def get_sensor_data(start: float = None, end: float = None, width: int = 1000):
         print(f"DEBUG: Final End: {end} Type: {type(end)}")
 
         # 2. Calculate dynamic bucket size based on screen width (pixels)
-        # Prevents over-fetching. We aim for ~1 data point per pixel.
         duration = end - start
-        if duration <= 0: return [[], []]
         
         # Avoid division by zero
-        bucket_size = duration / max(width, 1)
+        if width <= 0: width = 1000
+        
+        bucket_size = duration / width
+        
+        print(f"DEBUG: Duration: {duration}")
+        print(f"DEBUG: Width: {width}")
+        print(f"DEBUG: Bucket Size: {bucket_size}")
+        
+        if duration <= 0: return [[], []]
+        
+        # 3. Optimized Aggregation Query (The "Magic" Part)
         
         # 3. Optimized Aggregation Query (The "Magic" Part)
         # Instead of SELECT *, we bucketize the data.
