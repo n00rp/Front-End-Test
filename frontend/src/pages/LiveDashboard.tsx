@@ -28,9 +28,44 @@ export default function LiveDashboard() {
     const [viewMode, setViewMode] = useState<'graph' | 'heatmap'>('graph')
     const [loading, setLoading] = useState(false)
 
-    // Init with mock data
+    // Fetch real data from Backend API
     useEffect(() => {
-        setData(generateMockData(10000))
+        const fetchData = async () => {
+            try {
+                // Determine width for downsampling (default to window width)
+                const width = window.innerWidth;
+                const response = await fetch(`http://localhost:8000/api/data?width=${width}`)
+                if (!response.ok) throw new Error("API call failed")
+
+                const json = await response.json()
+                // Backend returns [ [times], [values] ]
+                // uPlot expects [ [times], [series1], [series2]... ]
+                // Our API currently returns [times, values] for one series (average)
+                // We map this to our graph.
+
+                if (json && json.length >= 2) {
+                    // Ensure we have correct structure. 
+                    // If backend sends [t, v], we create a basic structure
+                    // We might want to expand series 2 and 3 as copies or empty for now to match our 3-sensor graph setup
+                    const times = json[0]
+                    const values = json[1]
+
+                    // Placeholder: Just repeat data for demo sensors A, B, C or fill with null
+                    setData([
+                        times,
+                        values,
+                        values.map((v: number) => v * 1.1 + 5), // Mock variation for Sensor B 
+                        values.map((v: number) => v * 0.9 - 5)  // Mock variation for Sensor C
+                    ])
+                }
+            } catch (err) {
+                console.error("Failed to fetch from backend:", err)
+                // Fallback to mock data if backend not running
+                setData(generateMockData(10000))
+            }
+        }
+
+        fetchData()
     }, [])
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {

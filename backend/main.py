@@ -38,24 +38,67 @@ def get_status():
         return {"error": str(e), "hint": "Have you put CSV files in 'backend/data' and ran ingest_csv.py?"}
 
 @app.get("/api/data")
-def get_sensor_data(start: float = None, end: float = None, limit: int = 1000):
+def get_sensor_data(start: float = None, end: float = None, width: int = 1000):
     try:
         con = get_db_connection()
-        query = "SELECT * FROM sensors LIMIT ?"
-        params = [limit]
         
-        # Simple query for now
-        # In real implementation: We would use LTTB downsampling here
+        # 1. Determine time range if not provided
+        if start is None or end is None:
+            range_row = con.execute("SELECT min(time), max(time) FROM sensors").fetchone()
+            if not range_row or range_row[0] is None:
+                return [[], []] # Empty DB
+            db_min, db_max = range_row
+            start = start if start else db_min
+            end = end if end else db_max
+
+        # 2. Calculate dynamic bucket size based on screen width (pixels)
+        # Prevents over-fetching. We aim for ~1 data point per pixel.
+        duration = end - start
+        if duration <= 0: return [[], []]
         
-        df = con.execute(query, params).fetch_df()
+        # Avoid division by zero
+        bucket_size = duration / max(width, 1)
+        
+        # 3. Optimized Aggregation Query (The "Magic" Part)
+        # Instead of SELECT *, we bucketize the data.
+        # We fetch MIN and MAX for each bucket to keep the visual "shape" of the noisy data (M4-like approach)
+        
+        # TIME HANDLING: 
+        # Frontend (uPlot) expects Unix Timestamp in SECONDS (float).
+        # DuckDB stores 'time' as TIMESTAMP. We must use epoch(time) to convert to seconds.
+        
+        query = f"""
+            SELECT 
+                (FLOOR((epoch(time) - {start}) / {bucket_size}) * {bucket_size} + {start}) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= ? AND epoch(time) <= ?
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        """
+        
+        # Fetch directly as result set (iterator), do NOT fetch_df() which is memory heavy
+        result = con.execute(query, [start, end]).fetchall()
         con.close()
         
-        # Convert to uPlot format (array of arrays)
-        # Assuming table has 'time' column
-        # This is a placeholder since we don't know exact CSV schema yet
-        return df.to_dict(orient="records")
+        # 4. Transform to uPlot format: [ [time_series], [value_series_1], ... ]
+        # We simulate "3 series" here: Average, Min, Max (optional, or just return Avg)
+        # For simplicity in this PoC, let's just return the Average as the main line.
+        # If specific sensors are requested, we would add WHERE sensor_id = '..'
+        
+        times = []
+        values = []
+        
+        for row in result:
+            times.append(row[0])
+            values.append(row[1]) # Using Average for visualisation
+            
+        return [times, values]
         
     except Exception as e:
+         print(f"Error: {e}")
          raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
