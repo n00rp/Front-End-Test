@@ -89,6 +89,14 @@ def get_sensor_data(start: float = None, end: float = None, width: int = 1000):
         # Frontend (uPlot) expects Unix Timestamp in SECONDS (float).
         # DuckDB stores 'time' as TIMESTAMP. We must use epoch(time) to convert to seconds.
         
+        # 3. Optimized Aggregation Query (The "Magic" Part)
+        # Instead of SELECT *, we bucketize the data.
+        # We fetch MIN and MAX for each bucket to keep the visual "shape" of the noisy data (M4-like approach)
+        
+        # TIME HANDLING: 
+        # Frontend (uPlot) expects Unix Timestamp in SECONDS (float).
+        # DuckDB stores 'time' as TIMESTAMP. We must use epoch(time) to convert to seconds.
+        
         query = f"""
             SELECT 
                 (FLOOR((epoch(time) - {start}) / {bucket_size}) * {bucket_size} + {start}) as time_bucket,
@@ -96,13 +104,14 @@ def get_sensor_data(start: float = None, end: float = None, width: int = 1000):
                 min(value) as min_val,
                 max(value) as max_val
             FROM sensors 
-            WHERE epoch(time) >= ? AND epoch(time) <= ?
+            WHERE epoch(time) >= {start} AND epoch(time) <= {end}
             GROUP BY time_bucket
             ORDER BY time_bucket ASC
         """
         
         # Fetch directly as result set (iterator), do NOT fetch_df() which is memory heavy
-        result = con.execute(query, [start, end]).fetchall()
+        # Note: We use f-string for start/end because parameter binding with epoch() math can be tricky in some versions
+        result = con.execute(query).fetchall()
         con.close()
         
         # 4. Transform to uPlot format: [ [time_series], [value_series_1], ... ]
