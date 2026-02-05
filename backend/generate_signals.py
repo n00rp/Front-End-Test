@@ -6,9 +6,9 @@ import os
 output_dir = 'data'
 os.makedirs(output_dir, exist_ok=True)
 
-num_signals = 2000 # User requested 2000 signals
-num_samples = 10000 # User requested 10k points
-# Total = 20 Million Rows
+num_signals = 5 # Debug Mode: 5 files
+num_samples = 100 
+# Total = 500 Rows
 
 # Time range: 0 to 60 minutes (3600 seconds)
 time_range = 3600
