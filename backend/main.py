@@ -48,8 +48,22 @@ def get_sensor_data(start: float = None, end: float = None, width: int = 1000):
             if not range_row or range_row[0] is None:
                 return [[], []] # Empty DB
             db_min, db_max = range_row
-            start = start if start else db_min
-            end = end if end else db_max
+            
+            print(f"DEBUG: RAW DB Min: {db_min} Type: {type(db_min)}")
+            print(f"DEBUG: RAW DB Max: {db_max} Type: {type(db_max)}")
+            
+            # Helper to ensure we work with floats (Unix Epoch)
+            def to_epoch(val):
+                if hasattr(val, 'timestamp'): return val.timestamp()
+                # Handle pandas Timestamp specifically if needed, though hasattr timestamp covers it
+                if type(val) is int or type(val) is float: return val
+                return float(val) # Try casting
+                
+            start = start if start is not None else to_epoch(db_min)
+            end = end if end is not None else to_epoch(db_max)
+
+        print(f"DEBUG: Final Start: {start} Type: {type(start)}")
+        print(f"DEBUG: Final End: {end} Type: {type(end)}")
 
         # 2. Calculate dynamic bucket size based on screen width (pixels)
         # Prevents over-fetching. We aim for ~1 data point per pixel.

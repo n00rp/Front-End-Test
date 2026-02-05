@@ -20,3 +20,10 @@ venv/
 
 # System
 Thumbs.db
+
+# Project Data (Do not commit!)
+backend/data/
+backend/signals/
+*.duckdb
+*.duckdb.wal
+*.tmp
