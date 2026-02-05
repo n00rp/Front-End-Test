@@ -26,11 +26,29 @@ function generateMockData(pointCount: number): uPlot.AlignedData {
 export default function LiveDashboard() {
     const [data, setData] = useState<uPlot.AlignedData>([[], [], [], []])
     const [viewMode, setViewMode] = useState<'graph' | 'heatmap'>('graph')
+    const [loading, setLoading] = useState(false)
 
+    // Init with mock data
     useEffect(() => {
-        // Simulate fetching initial large dataset
         setData(generateMockData(10000))
     }, [])
+
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+
+        setLoading(true)
+        try {
+            const { parseCSV } = await import('../utils/csvLoader')
+            const parsedData = await parseCSV(file)
+            setData(parsedData)
+        } catch (err) {
+            console.error("CSV Parse Error", err)
+            alert("Failed to parse CSV")
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
         <div className="flex h-full overflow-hidden">
@@ -42,19 +60,34 @@ export default function LiveDashboard() {
                 <div className="h-14 border-b flex items-center justify-between px-6 bg-card/50 backdrop-blur-sm">
                     <TimeControls />
 
-                    <div className="flex bg-slate-900 rounded p-1 border border-slate-700">
-                        <button
-                            onClick={() => setViewMode('graph')}
-                            className={`p-2 rounded flex items-center gap-2 text-xs font-medium ${viewMode === 'graph' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-slate-800'}`}
-                        >
-                            <BarChart2 size={14} /> Graph
-                        </button>
-                        <button
-                            onClick={() => setViewMode('heatmap')}
-                            className={`p-2 rounded flex items-center gap-2 text-xs font-medium ${viewMode === 'heatmap' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-slate-800'}`}
-                        >
-                            <Grid size={14} /> Heatmap
-                        </button>
+                    <div className="flex items-center gap-4">
+                        {/* CSV Upload for Performance Testing */}
+                        <div className="relative group">
+                            <input
+                                type="file"
+                                accept=".csv"
+                                onChange={handleFileUpload}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                            <button className={`px-3 py-1 flex items-center gap-2 text-xs font-medium border rounded transition-colors ${loading ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-500' : 'bg-slate-900 border-slate-700 hover:border-slate-500'}`}>
+                                {loading ? 'Parsing...' : 'Upload CSV'}
+                            </button>
+                        </div>
+
+                        <div className="flex bg-slate-900 rounded p-1 border border-slate-700">
+                            <button
+                                onClick={() => setViewMode('graph')}
+                                className={`p-2 rounded flex items-center gap-2 text-xs font-medium ${viewMode === 'graph' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-slate-800'}`}
+                            >
+                                <BarChart2 size={14} /> Graph
+                            </button>
+                            <button
+                                onClick={() => setViewMode('heatmap')}
+                                className={`p-2 rounded flex items-center gap-2 text-xs font-medium ${viewMode === 'heatmap' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-slate-800'}`}
+                            >
+                                <Grid size={14} /> Heatmap
+                            </button>
+                        </div>
                     </div>
                 </div>
 
