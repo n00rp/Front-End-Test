@@ -6,27 +6,15 @@ import { TimeControls } from '../components/controls/TimeControls'
 import uPlot from 'uplot'
 import { BarChart2, Grid } from 'lucide-react'
 
-// Mock Data Generator for initial view
-function generateMockData(pointCount: number): uPlot.AlignedData {
-    const now = Math.floor(Date.now() / 1000)
-    const xs = []
-    const ys1 = []
-    const ys2 = []
-    const ys3 = []
 
-    for (let i = 0; i < pointCount; i++) {
-        xs.push(now - (pointCount - i))
-        ys1.push(Math.sin(i * 0.05) * 10 + Math.random() * 2)
-        ys2.push(Math.cos(i * 0.03) * 15 + Math.random() * 5 + 20)
-        ys3.push(Math.sin(i * 0.02) * 5 + Math.random() * 1 - 10)
-    }
-    return [xs, ys1, ys2, ys3] as uPlot.AlignedData
-}
 
 export default function LiveDashboard() {
-    const [data, setData] = useState<uPlot.AlignedData>([[], [], [], []])
+    const [data, setData] = useState<uPlot.AlignedData>([[]])
+    const [seriesConfig, setSeriesConfig] = useState<any[]>([])
     const [viewMode, setViewMode] = useState<'graph' | 'heatmap'>('graph')
     const [loading, setLoading] = useState(false)
+    const [timeRange, setTimeRange] = useState<{ start: number | null, end: number | null }>({ start: null, end: null })
+    const [interactionMode, setInteractionMode] = useState<'zoom' | 'pan'>('zoom')
 
     // Fetch real data from Backend API
     useEffect(() => {
@@ -34,39 +22,76 @@ export default function LiveDashboard() {
             try {
                 // Determine width for downsampling (default to window width)
                 const width = window.innerWidth;
-                const response = await fetch(`http://localhost:8000/api/data?width=${width}`)
+
+                // Get selected sensors from URL
+                const params = new URLSearchParams(window.location.search);
+                const sensorsParam = params.get('sensors');
+                const cleanIds = sensorsParam ? sensorsParam : ""; // Send empty or CSV
+
+                let url = `http://localhost:8000/api/data?width=${width}&ids=${cleanIds}`;
+                // Add time range if zoomed
+                if (timeRange.start !== null && timeRange.end !== null) {
+                    url += `&start=${timeRange.start}&end=${timeRange.end}`
+                }
+
+                const response = await fetch(url)
                 if (!response.ok) throw new Error("API call failed")
 
                 const json = await response.json()
-                // Backend returns [ [times], [values] ]
-                // uPlot expects [ [times], [series1], [series2]... ]
-                // Our API currently returns [times, values] for one series (average)
-                // We map this to our graph.
+                // Backend returns { time: [], series: [{id, data: []}, ...] }
 
-                if (json && json.length >= 2) {
-                    // Ensure we have correct structure. 
-                    // If backend sends [t, v], we create a basic structure
-                    // We might want to expand series 2 and 3 as copies or empty for now to match our 3-sensor graph setup
-                    const times = json[0]
-                    const values = json[1]
+                console.log("🔥 API Response:", json)
 
-                    // Placeholder: Just repeat data for demo sensors A, B, C or fill with null
-                    setData([
-                        times,
-                        values,
-                        values.map((v: number) => v * 1.1 + 5), // Mock variation for Sensor B 
-                        values.map((v: number) => v * 0.9 - 5)  // Mock variation for Sensor C
-                    ])
+                if (json && json.time && json.series) {
+                    const times = json.time
+
+                    // Construct AlignedData: [ [time], [s1], [s2]... ]
+                    const alignedData: any[] = [times]
+                    const newConfig: any[] = []
+
+                    const colors = [
+                        "#22d3ee", "#d946ef", "#84cc16", "#f59e0b", "#ef4444", "#3b82f6"
+                    ]
+
+                    json.series.forEach((s: any, idx: number) => {
+                        alignedData.push(s.data)
+                        newConfig.push({
+                            label: s.id,
+                            stroke: colors[idx % colors.length],
+                            width: 2
+                        })
+                    })
+
+                    console.log(`🔥 Received ${times.length} points for ${json.series.length} sensors`)
+
+                    setData(alignedData as uPlot.AlignedData)
+                    setSeriesConfig(newConfig)
+                } else {
+                    console.error("🔥 Invalid API Data Structure", json)
+                    setData([[]])
+                    setSeriesConfig([])
                 }
             } catch (err) {
                 console.error("Failed to fetch from backend:", err)
-                // Fallback to mock data if backend not running
-                setData(generateMockData(10000))
+                // Fallback (empty for now, removed mock generator)
+                setData([[]])
+                setSeriesConfig([])
             }
         }
 
         fetchData()
-    }, [])
+
+        // Listen for selection changes from Sidebar
+        const handleSelectionChange = () => {
+            console.log("⚡ Selection Changed! Refetching...")
+            fetchData()
+        }
+        window.addEventListener('sensor-selection-change', handleSelectionChange)
+
+        return () => {
+            window.removeEventListener('sensor-selection-change', handleSelectionChange)
+        }
+    }, [timeRange])
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
@@ -77,12 +102,39 @@ export default function LiveDashboard() {
             const { parseCSV } = await import('../utils/csvLoader')
             const parsedData = await parseCSV(file)
             setData(parsedData)
+            // Mock config for CSV for now
+            setSeriesConfig([{ label: "CSV Data", stroke: "#fff" }])
         } catch (err) {
             console.error("CSV Parse Error", err)
             alert("Failed to parse CSV")
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleZoom = (min: number, max: number) => {
+        console.log(`Zooming to: ${min} - ${max}`)
+        setTimeRange({ start: min, end: max })
+    }
+
+    // Pan Handler
+    const handlePan = (deltaSeconds: number) => {
+        if (!data || !data[0] || data[0].length === 0) return
+
+        let currentStart = timeRange.start
+        let currentEnd = timeRange.end
+
+        // If no range set (full view), derive from current data
+        if (currentStart === null || currentEnd === null) {
+            const times = data[0]
+            currentStart = times[0]
+            currentEnd = times[times.length - 1]
+        }
+
+        const newStart = currentStart! + deltaSeconds
+        const newEnd = currentEnd! + deltaSeconds
+
+        setTimeRange({ start: newStart, end: newEnd })
     }
 
     return (
@@ -93,7 +145,35 @@ export default function LiveDashboard() {
             <div className="flex-1 flex flex-col min-w-0 bg-background/50">
                 {/* Top Bar with Controls */}
                 <div className="h-14 border-b flex items-center justify-between px-6 bg-card/50 backdrop-blur-sm">
-                    <TimeControls />
+
+                    <div className="flex items-center gap-4">
+                        <TimeControls />
+
+                        <div className="flex bg-slate-900 rounded p-1 border border-slate-700 ml-4">
+                            <button
+                                onClick={() => setInteractionMode('zoom')}
+                                title="Zoom Mode (Drag to select)"
+                                className={`px-3 py-1 rounded text-xs font-bold transition-colors ${interactionMode === 'zoom' ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-400 hover:text-white'}`}
+                            >
+                                Zoom
+                            </button>
+                            <button
+                                onClick={() => setInteractionMode('pan')}
+                                title="Pan Mode (Drag to move)"
+                                className={`px-3 py-1 rounded text-xs font-bold transition-colors ${interactionMode === 'pan' ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-400 hover:text-white'}`}
+                            >
+                                Pan
+                            </button>
+                        </div>
+                        {timeRange.start !== null && (
+                            <button
+                                onClick={() => setTimeRange({ start: null, end: null })}
+                                className="px-3 py-1 bg-red-500/20 text-red-500 border border-red-500/50 rounded text-xs font-bold hover:bg-red-500/30 transition-colors"
+                            >
+                                Reset Zoom
+                            </button>
+                        )}
+                    </div>
 
                     <div className="flex items-center gap-4">
                         {/* CSV Upload for Performance Testing */}
@@ -108,6 +188,7 @@ export default function LiveDashboard() {
                                 {loading ? 'Parsing...' : 'Upload CSV'}
                             </button>
                         </div>
+
 
                         <div className="flex bg-slate-900 rounded p-1 border border-slate-700">
                             <button
@@ -134,15 +215,34 @@ export default function LiveDashboard() {
                             <div className="text-2xl font-mono font-bold text-cyan-400 mt-1">2 Selection</div>
                         </div>
                         <div className="p-4 rounded-xl bg-card border shadow-sm">
-                            <span className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Data Rate</span>
-                            <div className="text-2xl font-mono font-bold text-lime-400 mt-1">12 kHz</div>
+                            <span className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Data Points</span>
+                            <div className="text-2xl font-mono font-bold text-lime-400 mt-1">
+                                {data && data[0] ? data[0].length : 0}
+                            </div>
                         </div>
+                    </div>
+
+                    {/* DEBUG PANEL */}
+                    <div className="p-4 bg-red-900/20 border border-red-500/50 rounded text-xs font-mono text-white overflow-auto max-h-32">
+                        <strong>DEBUG INFO:</strong><br />
+                        Data Loaded: {data && data[0] ? "YES" : "NO"} <br />
+                        Point Count: {data && data[0] ? data[0].length : 0} <br />
+                        First Time: {data && data[0] && data[0][0] ? new Date(data[0][0] * 1000).toLocaleString() : "N/A"} <br />
+                        First Value: {data && data[1] && data[1][0] ? data[1][0] : "N/A"} <br />
+                        Backend URL: http://localhost:8000/api/data?width={window.innerWidth}
                     </div>
 
                     {/* Main Graph Area */}
                     <div className="flex-1 min-h-[500px] w-full bg-card rounded-xl border shadow-sm flex items-center justify-center p-1 relative">
                         {viewMode === 'graph' ? (
-                            <SensorGraph data={data} height={600} />
+                            <SensorGraph
+                                data={data}
+                                seriesConfig={seriesConfig}
+                                height={600}
+                                onZoom={handleZoom}
+                                interactionMode={interactionMode}
+                                onPan={handlePan}
+                            />
                         ) : (
                             <HeatmapView />
                         )}

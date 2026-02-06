@@ -37,96 +37,157 @@ def get_status():
     except Exception as e:
         return {"error": str(e), "hint": "Have you put CSV files in 'backend/data' and ran ingest_csv.py?"}
 
+@app.get("/api/sensors")
+def get_sensors():
+    try:
+        con = get_db_connection()
+        # Fetch distinct sensor IDs (assuming we have a sensor_id column or implicitly file-based)
+        # In our schema, we have 'sensor_id' column or we can assume filenames from ingest.
+        # Let's check schema first. The ingest script adds 'sensor_id'.
+        sensors = con.execute("SELECT DISTINCT sensor_id FROM sensors ORDER BY sensor_id").fetchall()
+        con.close()
+        
+        # Flatten list of tuples [('s1',), ('s2',)] -> ['s1', 's2']
+        sensor_list = [s[0] for s in sensors]
+        
+        # Group them for the UI (Mock grouping for now based on name)
+        # e.g. signal_0001 -> "Group A"
+        grouped = {
+            "Generated Signals": sensor_list
+        }
+        
+        return grouped
+    except Exception as e:
+        print(f"Error fetching sensors: {e}")
+        return {"error": str(e)}
+
 @app.get("/api/data")
-def get_sensor_data(start: float = None, end: float = None, width: int = 1000):
+def get_sensor_data(start: float = None, end: float = None, width: int = 1000, ids: str = ""):
     try:
         con = get_db_connection()
         
+        # Parse IDs
+        sensor_filter = []
+        if ids and ids.strip():
+            sensor_filter = [s.strip() for s in ids.split(',') if s.strip()]
+        
+        print(f"DEBUG: Request Params -> Width: {width}, Sensors: {len(sensor_filter)}")
+
         # 1. Determine time range if not provided
         if start is None or end is None:
-            range_row = con.execute("SELECT min(time), max(time) FROM sensors").fetchone()
+            # Optimize: Get range only for selected sensors if specified
+            if sensor_filter:
+                # Use parameterized query for safety
+                placeholders = ', '.join(['?'] * len(sensor_filter))
+                range_query = f"SELECT min(epoch(time)), max(epoch(time)) FROM sensors WHERE sensor_id IN ({placeholders})"
+                range_row = con.execute(range_query, sensor_filter).fetchone()
+            else:
+                range_row = con.execute("SELECT min(epoch(time)), max(epoch(time)) FROM sensors").fetchone()
+                
             if not range_row or range_row[0] is None:
-                return [[], []] # Empty DB
+                return [[], []] # Empty DB or no match
             db_min, db_max = range_row
-            
-            print(f"DEBUG: RAW DB Min: {db_min} Type: {type(db_min)}")
-            print(f"DEBUG: RAW DB Max: {db_max} Type: {type(db_max)}")
             
             # Helper to ensure we work with floats (Unix Epoch)
             def to_epoch(val):
                 if hasattr(val, 'timestamp'): return val.timestamp()
-                # Handle pandas Timestamp specifically if needed, though hasattr timestamp covers it
                 if type(val) is int or type(val) is float: return val
-                return float(val) # Try casting
-                
-            start = start if start is not None else to_epoch(db_min)
-            end = end if end is not None else to_epoch(db_max)
+                return float(val)
 
-        print(f"DEBUG: Final Start: {start} Type: {type(start)}")
-        print(f"DEBUG: Final End: {end} Type: {type(end)}")
+            start = start if start is not None else db_min
+            end = end if end is not None else db_max
 
-        # 2. Calculate dynamic bucket size based on screen width (pixels)
+        # 2. Calculate dynamic bucket size
         duration = end - start
-        
-        # Avoid division by zero
         if width <= 0: width = 1000
-        
         bucket_size = duration / width
         
-        print(f"DEBUG: Duration: {duration}")
-        print(f"DEBUG: Width: {width}")
-        print(f"DEBUG: Bucket Size: {bucket_size}")
+        if duration <= 0: return {"time": [], "series": []}
         
-        if duration <= 0: return [[], []]
+        # 3. Optimized Aggregation Query
+        # We group by integer bucket index AND sensor_id.
         
-        # 3. Optimized Aggregation Query (The "Magic" Part)
+        f_start = f"{start:.6f}"
+        f_end = f"{end:.6f}"
+        f_bucket = f"{bucket_size:.6f}"
         
-        # 3. Optimized Aggregation Query (The "Magic" Part)
-        # Instead of SELECT *, we bucketize the data.
-        # We fetch MIN and MAX for each bucket to keep the visual "shape" of the noisy data (M4-like approach)
+        where_clause = f"epoch(time) >= {f_start} AND epoch(time) <= {f_end}"
+        params = []
         
-        # TIME HANDLING: 
-        # Frontend (uPlot) expects Unix Timestamp in SECONDS (float).
-        # DuckDB stores 'time' as TIMESTAMP. We must use epoch(time) to convert to seconds.
-        
-        # 3. Optimized Aggregation Query (The "Magic" Part)
-        # Instead of SELECT *, we bucketize the data.
-        # We fetch MIN and MAX for each bucket to keep the visual "shape" of the noisy data (M4-like approach)
-        
-        # TIME HANDLING: 
-        # Frontend (uPlot) expects Unix Timestamp in SECONDS (float).
-        # DuckDB stores 'time' as TIMESTAMP. We must use epoch(time) to convert to seconds.
-        
+        if sensor_filter:
+            # Add sensor filter
+            placeholders = ', '.join(['?'] * len(sensor_filter))
+            where_clause += f" AND sensor_id IN ({placeholders})"
+            params = sensor_filter
+
         query = f"""
             SELECT 
-                (FLOOR((epoch(time) - {start}) / {bucket_size}) * {bucket_size} + {start}) as time_bucket,
-                avg(value) as avg_val,
-                min(value) as min_val,
-                max(value) as max_val
+                CAST(FLOOR((epoch(time) - {f_start}) / {f_bucket}) AS INTEGER) as bucket_idx,
+                sensor_id,
+                avg(value) as avg_val
             FROM sensors 
-            WHERE epoch(time) >= {start} AND epoch(time) <= {end}
-            GROUP BY time_bucket
-            ORDER BY time_bucket ASC
+            WHERE {where_clause}
+            GROUP BY bucket_idx, sensor_id
+            ORDER BY bucket_idx ASC
         """
         
-        # Fetch directly as result set (iterator), do NOT fetch_df() which is memory heavy
-        # Note: We use f-string for start/end because parameter binding with epoch() math can be tricky in some versions
-        result = con.execute(query).fetchall()
+        rows = con.execute(query, params).fetchall()
+        # print(f"DEBUG: Aggregated {len(rows)} points.")
         con.close()
         
-        # 4. Transform to uPlot format: [ [time_series], [value_series_1], ... ]
-        # We simulate "3 series" here: Average, Min, Max (optional, or just return Avg)
-        # For simplicity in this PoC, let's just return the Average as the main line.
-        # If specific sensors are requested, we would add WHERE sensor_id = '..'
+        # 4. Pivot Data for Frontend (Unified Time Axis)
+        # We need a dense array of times, and sparse arrays for each sensor (filling gaps with None or NaN)
+        # However, uPlot expects aligned data. We will fill gaps with None (null in JSON).
         
+        # Calculate expected number of buckets
+        num_buckets = int(width)
+        
+        # Create master time array
         times = []
-        values = []
+        start_float = float(start)
+        bucket_float = float(bucket_size)
+        for i in range(num_buckets + 1): # +1 to include end
+             times.append(start_float + i * bucket_float)
+             
+        # Organize data by sensor
+        # sensor_data = { "sensor_id": { bucket_idx: value } }
+        sensor_map = {}
+        distinct_sensors = set()
         
-        for row in result:
-            times.append(row[0])
-            values.append(row[1]) # Using Average for visualisation
+        for r in rows:
+            b_idx = r[0]
+            s_id = r[1]
+            val = r[2]
             
-        return [times, values]
+            if s_id not in sensor_map:
+                sensor_map[s_id] = {}
+                distinct_sensors.add(s_id)
+            
+            sensor_map[s_id][b_idx] = val
+            
+        # Build final response structure
+        # Sort sensors for consistent order
+        sorted_sensors = sorted(list(distinct_sensors))
+        
+        series_list = []
+        for s_id in sorted_sensors:
+            data_points = []
+            s_data = sensor_map[s_id]
+            
+            for i in range(num_buckets + 1):
+                # If we have a value for this bucket, use it. Otherwise None/Null
+                val = s_data.get(i, None)
+                data_points.append(val)
+            
+            series_list.append({
+                "id": s_id,
+                "data": data_points
+            })
+            
+        return {
+            "time": times,
+            "series": series_list
+        }
         
     except Exception as e:
          print(f"Error: {e}")

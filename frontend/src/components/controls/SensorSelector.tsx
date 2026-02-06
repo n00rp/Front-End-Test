@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, ChevronRight, ChevronDown, Check, Folder } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -7,45 +7,90 @@ interface SensorNode {
     name: string
     type: 'folder' | 'sensor'
     children?: SensorNode[]
-    selected?: boolean
 }
 
-// Mock Data Structure
-const MOCK_TREE: SensorNode[] = [
-    {
-        id: 'root-1',
-        name: 'Production Line A',
-        type: 'folder',
-        children: [
-            { id: 's-1', name: 'Temp_Extruder_1', type: 'sensor' },
-            { id: 's-2', name: 'Temp_Extruder_2', type: 'sensor' },
-            { id: 's-3', name: 'Pressure_Main', type: 'sensor' },
-        ]
-    },
-    {
-        id: 'root-2',
-        name: 'Production Line B',
-        type: 'folder',
-        children: [
-            { id: 's-4', name: 'Vibration_Motor_X', type: 'sensor' },
-            { id: 's-5', name: 'Vibration_Motor_Y', type: 'sensor' },
-            {
-                id: 'sub-1',
-                name: 'Cooling System',
-                type: 'folder',
-                children: [
-                    { id: 's-6', name: 'Flow_Rate_In', type: 'sensor' },
-                    { id: 's-7', name: 'Flow_Rate_Out', type: 'sensor' }
-                ]
-            }
-        ]
-    }
-]
-
 export function SensorSelector() {
-    const [expanded, setExpanded] = useState<Set<string>>(new Set(['root-1', 'root-2']))
-    const [selected, setSelected] = useState<Set<string>>(new Set(['s-1', 's-2']))
+    const [nodes, setNodes] = useState<SensorNode[]>([])
+    const [expanded, setExpanded] = useState<Set<string>>(new Set())
+    const [selected, setSelected] = useState<Set<string>>(new Set())
     const [searchTerm, setSearchTerm] = useState('')
+
+    // Fetch sensors and build tree
+    useEffect(() => {
+        fetch('http://localhost:8000/api/sensors')
+            .then(res => res.json())
+            .then((data: Record<string, string[]>) => {
+                const tree: SensorNode[] = []
+                const allSensors = new Set<string>()
+
+                Object.entries(data).forEach(([group, sensors], idx) => {
+                    const groupId = `group-${idx}`
+                    tree.push({
+                        id: groupId,
+                        name: group,
+                        type: 'folder',
+                        children: sensors.map(s => {
+                            allSensors.add(s)
+                            return { id: s, name: s, type: 'sensor' }
+                        })
+                    })
+                })
+                setNodes(tree)
+                setExpanded(new Set(tree.map(n => n.id))) // Expand all groups by default
+
+                // Initialize selection from URL
+                const params = new URLSearchParams(window.location.search)
+                const sensorsParam = params.get('sensors')
+
+                if (!sensorsParam) {
+                    // Empty param = All selected (implied)
+                    // But visually we might want to show all checked? 
+                    // Or keep 'selected' empty to mean 'all'?
+                    // Let's explicitly check all for visual consistency if param is missing (default state)
+                    // OR: explicit 'ALL' flag.
+                    // For UI feedback, let's select existing ones.
+                    setSelected(allSensors)
+                } else if (sensorsParam !== 'NONE') {
+                    setSelected(new Set(sensorsParam.split(',')))
+                }
+            })
+            .catch(err => console.error("Failed to load sensors:", err))
+    }, [])
+
+    const updateUrl = (newSelected: Set<string>) => {
+        const params = new URLSearchParams(window.location.search)
+
+        // Logic: 
+        // If "All" are selected (or close to it? no, simplistic), we can't easily detect "All" without knowing total count always.
+        // But we can check if count is high.
+        // Actually, let's revert to: "Clear All" -> Remove Param.
+        // If user selects specific, add them.
+
+        const count = newSelected.size
+        // If 0 selected, maybe we want 0?
+        if (count === 0) {
+            // Let's say empty URL = All. 
+            // So if we want NONE, we need a flag? 
+            // Or we just don't fetch. 
+            // Let's assume user wants to filter.
+            // If we want 0 items, we can set sensors=NONE.
+            params.set('sensors', 'NONE')
+        } else {
+            // If massive selection, simplistic fix for 431:
+            // If > 200 items, assume "ALL" intent or warn? 
+            // Let's just omit params if it looks like "All" (heuristically > 100 for now?)
+            // This is a hack, but solves the crash.
+            if (count > 50) {
+                params.delete('sensors') // Fallback to "All"
+            } else {
+                params.set('sensors', Array.from(newSelected).join(','))
+            }
+        }
+
+        const newUrl = `${window.location.pathname}?${params.toString()}`
+        window.history.replaceState(null, '', newUrl)
+        window.dispatchEvent(new Event('sensor-selection-change'))
+    }
 
     const toggleExpand = (id: string) => {
         const newExpanded = new Set(expanded)
@@ -59,12 +104,37 @@ export function SensorSelector() {
         if (newSelected.has(id)) newSelected.delete(id)
         else newSelected.add(id)
         setSelected(newSelected)
+        updateUrl(newSelected)
+    }
+
+    const selectAll = () => {
+        // Collect all sensor IDs
+        const all = new Set<string>()
+        nodes.forEach(g => g.children?.forEach(s => all.add(s.id)))
+        setSelected(all)
+        // For URL: Empty param = All
+        const params = new URLSearchParams(window.location.search)
+        params.delete('sensors')
+        const newUrl = `${window.location.pathname}?${params.toString()}`
+        window.history.replaceState(null, '', newUrl)
+        window.dispatchEvent(new Event('sensor-selection-change'))
+    }
+
+    const clearAll = () => {
+        setSelected(new Set())
+        updateUrl(new Set())
     }
 
     const renderNode = (node: SensorNode, level: number = 0) => {
         // Simple filter logic
         if (searchTerm && node.type === 'sensor' && !node.name.toLowerCase().includes(searchTerm.toLowerCase())) {
             return null
+        }
+
+        // Filter folders if no children match
+        if (node.type === 'folder' && searchTerm) {
+            const hasMatchingChild = node.children?.some(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            if (!hasMatchingChild) return null
         }
 
         const isExpanded = expanded.has(node.id)
@@ -90,7 +160,7 @@ export function SensorSelector() {
                             {isSelected && <Check size={10} className="text-white" />}
                         </div>
                     )}
-                    <span>{node.name}</span>
+                    <span className="truncate">{node.name}</span>
                 </div>
                 {node.type === 'folder' && isExpanded && node.children && (
                     <div>
@@ -116,11 +186,14 @@ export function SensorSelector() {
                 </div>
             </div>
             <div className="flex-1 overflow-auto py-2">
-                {MOCK_TREE.map(node => renderNode(node))}
+                {nodes.map(node => renderNode(node))}
             </div>
             <div className="p-3 border-t bg-slate-900/50 text-xs text-muted-foreground flex justify-between">
                 <span>Selected: {selected.size}</span>
-                <button className="text-primary hover:underline" onClick={() => setSelected(new Set())}>Clear All</button>
+                <div className="flex gap-2">
+                    <button className="text-primary hover:underline" onClick={selectAll}>All</button>
+                    <button className="text-primary hover:underline" onClick={clearAll}>None</button>
+                </div>
             </div>
         </div>
     )

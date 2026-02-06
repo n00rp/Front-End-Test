@@ -1,0 +1,602 @@
+INFO:     Started server process [6960]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:52455 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:53812 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:61658 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:61658 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:61658 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:61658 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:61658 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:61658 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:58166 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:58166 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:58166 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:58166 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:63492 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:63492 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:59896 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
+DEBUG: RAW DB Min: 2026-02-05 13:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: RAW DB Max: 2026-02-05 14:17:02.274859 Type: <class 'datetime.datetime'>
+DEBUG: Final Start: 1770293822.274859 Type: <class 'float'>
+DEBUG: Final End: 1770297422.274859 Type: <class 'float'>
+DEBUG: Duration: 3600.0
+DEBUG: Width: 1440
+DEBUG: Bucket Size: 2.5
+DEBUG: QUERY -> 
+            SELECT 
+                (FLOOR((epoch(time) - 1770293822.274859) / 2.500000) * 2.500000 + 1770293822.274859) as time_bucket,
+                avg(value) as avg_val,
+                min(value) as min_val,
+                max(value) as max_val
+            FROM sensors 
+            WHERE epoch(time) >= 1770293822.274859 AND epoch(time) <= 1770297422.274859
+            GROUP BY time_bucket
+            ORDER BY time_bucket ASC
+        
+DEBUG: Result Count -> 1
+INFO:     127.0.0.1:59896 - "GET /api/data?width=1440 HTTP/1.1" 200 OK
